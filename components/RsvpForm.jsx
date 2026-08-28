@@ -188,7 +188,7 @@ export default function RsvpForm() {
         )}
 
         <button type="submit" className={styles.submitBtn} disabled={isSubmitting || locked}>
-          {isSubmitting ? "Sending…" : locked ? "RSVP Sent ♡" : "RSVP ♡"}
+          {isSubmitting ? "Sending…" : locked ? "RSVP Sent" : "RSVP"}
         </button>
       </form>
 
