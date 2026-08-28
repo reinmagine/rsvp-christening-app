@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import GuestFields from "./GuestFields";
 import styles from "./ManageRsvp.module.css";
 import { normalizePhilippineMobile } from "@/lib/phone";
+import eventConfig from "@/lib/config";
 
 const emptyGuest = () => ({ firstName: "" });
 
@@ -55,6 +56,12 @@ export default function ManageRsvp() {
 
   function updateCoGuest(index, field, value) {
     setCoGuests((current) => current.map((guest, i) => i === index ? { ...guest, [field]: value } : guest));
+  }
+
+  function addCoGuest() {
+    setCoGuests((current) =>
+      current.length < eventConfig.maxCoGuests ? [...current, emptyGuest()] : current
+    );
   }
 
   async function saveChanges(event) {
@@ -128,6 +135,7 @@ export default function ManageRsvp() {
           <>
             <h1 className="sectionHeading">Update your response</h1>
             <p className="supportingText">Change your details or withdraw your attendance below.</p>
+            <p className="supportingText">You may add up to {eventConfig.maxCoGuests} co-guests.</p>
             <form className={styles.form} onSubmit={saveChanges}>
               <fieldset disabled={status === "saving" || status === "withdrawn"} className={styles.fieldset}>
                 <legend>Will you be joining us?</legend>
@@ -140,7 +148,7 @@ export default function ManageRsvp() {
                   <GuestFields key={index} guest={guest} errors={errors.coGuests[index] || {}} onChange={(field, value) => updateCoGuest(index, field, value)} index={index} onRemove={() => setCoGuests((current) => current.filter((_, i) => i !== index))} disabled={status === "saving" || status === "withdrawn"} />
                 ))}
               </div>
-              {status !== "withdrawn" && <button type="button" className={styles.secondaryButton} onClick={() => setCoGuests((current) => [...current, emptyGuest()])}>+ Add a Guest</button>}
+              {status !== "withdrawn" && <button type="button" className={styles.secondaryButton} onClick={addCoGuest} disabled={status === "saving" || coGuests.length >= eventConfig.maxCoGuests}>+ Add a Guest</button>}
               {message && <p className={status === "saved" || status === "withdrawn" ? styles.success : styles.error} role="status">{message}</p>}
               {status !== "withdrawn" && <button className={styles.submitButton} disabled={status === "saving"} type="submit">{status === "saving" ? "Saving…" : "Save Changes"}</button>}
             </form>

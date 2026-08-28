@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getRsvp, updateRsvp, withdrawRsvp } from "@/lib/rsvpStore";
 import { normalizePhilippineMobile } from "@/lib/phone";
+import eventConfig from "@/lib/config";
 
 function validateGuest(guest, requirePhone) {
   if (!guest || typeof guest !== "object" || Array.isArray(guest)) {
@@ -18,7 +19,7 @@ function validateGuest(guest, requirePhone) {
 function validEntry(entry) {
   if (!entry || typeof entry !== "object" || Array.isArray(entry)) return null;
   if (entry.attending !== "yes" && entry.attending !== "no") return null;
-  if (!Array.isArray(entry.coGuests) || entry.coGuests.length > 20) return null;
+  if (!Array.isArray(entry.coGuests) || entry.coGuests.length > eventConfig.maxCoGuests) return null;
 
   const primary = validateGuest(entry.primaryGuest, true);
   const coGuests = entry.coGuests.map((guest) => validateGuest(guest, false));

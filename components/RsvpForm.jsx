@@ -6,6 +6,7 @@ import SuccessModal from "./SuccessModal";
 import { FloralDivider } from "./Decorations";
 import styles from "./RsvpForm.module.css";
 import { normalizePhilippineMobile } from "@/lib/phone";
+import eventConfig from "@/lib/config";
 
 const emptyGuest = () => ({ firstName: "", contactNumber: "" });
 
@@ -30,7 +31,9 @@ export default function RsvpForm() {
   }
 
   function addGuest() {
-    setCoGuests((list) => [...list, emptyGuest()]);
+    setCoGuests((list) =>
+      list.length < eventConfig.maxCoGuests ? [...list, emptyGuest()] : list
+    );
   }
 
   function removeGuest(index) {
@@ -108,6 +111,7 @@ export default function RsvpForm() {
   }
 
   const isSubmitting = status === "submitting";
+  const canAddGuest = !locked && !isSubmitting && coGuests.length < eventConfig.maxCoGuests;
 
   return (
     <section className={`card ${styles.wrap}`} id="rsvp">
@@ -161,7 +165,7 @@ export default function RsvpForm() {
         <div className={styles.coGuestSection}>
           <h3 className={styles.coGuestHeading}>Bringing someone with you?</h3>
           <p className="supportingText">
-            You may add your co-guests below if you&rsquo;d like to bring someone along.
+            You may add up to {eventConfig.maxCoGuests} co-guests.
           </p>
 
           <div className={styles.guestsBlock}>
@@ -182,7 +186,7 @@ export default function RsvpForm() {
             type="button"
             className={styles.addGuestBtn}
             onClick={addGuest}
-            disabled={locked}
+            disabled={!canAddGuest}
           >
             + Add a Guest
           </button>

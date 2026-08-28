@@ -1,5 +1,6 @@
 const WEBHOOK_SECRET = "CFPqR7nh19gjB9k5CcSuS9naexaZ-SMTe1w4_ns11uI";
 const SHEET_NAME = "";
+const MAX_CO_GUESTS = 3;
 
 const HEADERS = [
   "RSVP ID",
@@ -276,7 +277,7 @@ function isValidEntry(entry) {
   if (!normalizePhilippineMobile(entry.primaryGuest.contactNumber)) return false;
 
   var coGuests = entry.coGuests;
-  if (!Array.isArray(coGuests) || coGuests.length > 20) return false;
+  if (!Array.isArray(coGuests) || coGuests.length > MAX_CO_GUESTS) return false;
   if (Number(entry.guestCount) !== 1 + coGuests.length) return false;
   return coGuests.every(function (guest) {
     return guest && typeof guest === "object" && String(guest.firstName || "").trim();

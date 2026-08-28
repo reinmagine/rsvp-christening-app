@@ -68,6 +68,11 @@
   color: var(--ink);
 }
 
+.secondaryButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .withdrawButton {
   width: 100%;
   margin-top: 18px;

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createManagementToken, createRsvp } from "@/lib/rsvpStore";
 import { normalizePhilippineMobile } from "@/lib/phone";
+import eventConfig from "@/lib/config";
 
 function cleanName(value) {
   return typeof value === "string" ? value.trim().slice(0, 80) : "";
@@ -55,8 +56,8 @@ export async function POST(request) {
   }
 
   const guestList = coGuests || [];
-  if (guestList.length > 20) {
-    return NextResponse.json({ ok: false, message: "You may add up to 20 co-guests." }, { status: 400 });
+  if (guestList.length > eventConfig.maxCoGuests) {
+    return NextResponse.json({ ok: false, message: `You may add up to ${eventConfig.maxCoGuests} co-guests.` }, { status: 400 });
   }
   const coGuestResults = guestList.map((g) => validateGuest(g, { requirePhone: false }));
 
