@@ -1,4 +1,4 @@
-# Christening Invitation RSVP Web Appl
+# Christening Invitation RSVP Web App
 
 A warm, mobile-first invitation and RSVP experience created for a christening celebration.
 
