@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import GuestFields from "./GuestFields";
 import styles from "./ManageRsvp.module.css";
+import { normalizePhilippineMobile } from "@/lib/phone";
 
 const emptyGuest = () => ({ firstName: "" });
 
@@ -14,6 +15,7 @@ export default function ManageRsvp() {
   const [coGuests, setCoGuests] = useState([]);
   const [status, setStatus] = useState("loading");
   const [message, setMessage] = useState("");
+  const [errors, setErrors] = useState({ primaryGuest: {}, coGuests: [] });
   const [withdrawOpen, setWithdrawOpen] = useState(false);
   const cancelWithdrawRef = useRef(null);
 
@@ -57,6 +59,24 @@ export default function ManageRsvp() {
 
   async function saveChanges(event) {
     event.preventDefault();
+
+    const primaryErrors = {};
+    if (!entry.primaryGuest.firstName.trim()) primaryErrors.firstName = "Please enter a first name.";
+    if (!normalizePhilippineMobile(entry.primaryGuest.contactNumber)) {
+      primaryErrors.contactNumber = "Please enter a valid Philippine mobile number.";
+    }
+    const coGuestErrors = coGuests.map((guest) => (
+      guest.firstName.trim() ? {} : { firstName: "Please enter a first name." }
+    ));
+    const hasErrors =
+      Object.keys(primaryErrors).length > 0 ||
+      coGuestErrors.some((guestErrors) => Object.keys(guestErrors).length > 0);
+    setErrors({ primaryGuest: primaryErrors, coGuests: coGuestErrors });
+    if (hasErrors) {
+      setMessage("Please double-check the highlighted fields.");
+      return;
+    }
+
     setStatus("saving");
     setMessage("");
     const response = await fetch(`/api/rsvp/manage?token=${encodeURIComponent(token)}`, {
@@ -64,7 +84,10 @@ export default function ManageRsvp() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         attending: entry.attending,
-        primaryGuest: entry.primaryGuest,
+        primaryGuest: {
+          ...entry.primaryGuest,
+          contactNumber: normalizePhilippineMobile(entry.primaryGuest.contactNumber),
+        },
         coGuests: coGuests.map((guest) => ({ firstName: guest.firstName })),
         guestCount: 1 + coGuests.length,
       }),
@@ -111,10 +134,10 @@ export default function ManageRsvp() {
                 <label><input type="radio" checked={entry.attending === "yes"} onChange={() => setEntry({ ...entry, attending: "yes" })} /> Yes, I’ll be there!</label>
                 <label><input type="radio" checked={entry.attending === "no"} onChange={() => setEntry({ ...entry, attending: "no" })} /> Sorry, I can’t make it.</label>
               </fieldset>
-              <GuestFields guest={entry.primaryGuest} errors={{}} onChange={updatePrimary} isPrimary disabled={status === "saving" || status === "withdrawn"} />
+              <GuestFields guest={entry.primaryGuest} errors={errors.primaryGuest} onChange={updatePrimary} isPrimary disabled={status === "saving" || status === "withdrawn"} />
               <div className={styles.guestsBlock}>
                 {coGuests.map((guest, index) => (
-                  <GuestFields key={index} guest={guest} errors={{}} onChange={(field, value) => updateCoGuest(index, field, value)} index={index} onRemove={() => setCoGuests((current) => current.filter((_, i) => i !== index))} disabled={status === "saving" || status === "withdrawn"} />
+                  <GuestFields key={index} guest={guest} errors={errors.coGuests[index] || {}} onChange={(field, value) => updateCoGuest(index, field, value)} index={index} onRemove={() => setCoGuests((current) => current.filter((_, i) => i !== index))} disabled={status === "saving" || status === "withdrawn"} />
                 ))}
               </div>
               {status !== "withdrawn" && <button type="button" className={styles.secondaryButton} onClick={() => setCoGuests((current) => [...current, emptyGuest()])}>+ Add a Guest</button>}

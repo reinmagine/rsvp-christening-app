@@ -5,6 +5,7 @@ import GuestFields from "./GuestFields";
 import SuccessModal from "./SuccessModal";
 import { FloralDivider } from "./Decorations";
 import styles from "./RsvpForm.module.css";
+import { normalizePhilippineMobile } from "@/lib/phone";
 
 const emptyGuest = () => ({ firstName: "", contactNumber: "" });
 
@@ -40,8 +41,10 @@ export default function RsvpForm() {
   function validateLocally() {
     const primaryErrors = {};
     if (!primaryGuest.firstName.trim()) primaryErrors.firstName = "Please enter your first name.";
-    const digits = primaryGuest.contactNumber.replace(/[^\d]/g, "");
-    if (digits.length < 7) primaryErrors.contactNumber = "Please enter a valid contact number.";
+    const normalizedContactNumber = normalizePhilippineMobile(primaryGuest.contactNumber);
+    if (!normalizedContactNumber) {
+      primaryErrors.contactNumber = "Please enter a valid Philippine mobile number.";
+    }
 
     const coErrors = coGuests.map((g) => {
       const e = {};
@@ -75,7 +78,14 @@ export default function RsvpForm() {
       const res = await fetch("/api/rsvp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ primaryGuest, coGuests, attending }),
+        body: JSON.stringify({
+          primaryGuest: {
+            ...primaryGuest,
+            contactNumber: normalizePhilippineMobile(primaryGuest.contactNumber),
+          },
+          coGuests,
+          attending,
+        }),
       });
 
       const data = await res.json().catch(() => ({}));

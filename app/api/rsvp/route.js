@@ -1,11 +1,6 @@
 import { NextResponse } from "next/server";
 import { createManagementToken, createRsvp } from "@/lib/rsvpStore";
-
-function isValidPhone(value) {
-  if (!value) return false;
-  const digits = value.replace(/[^\d]/g, "");
-  return digits.length >= 7 && digits.length <= 15;
-}
+import { normalizePhilippineMobile } from "@/lib/phone";
 
 function cleanName(value) {
   return typeof value === "string" ? value.trim().slice(0, 80) : "";
@@ -13,11 +8,15 @@ function cleanName(value) {
 
 function validateGuest(guest, { requirePhone }) {
   const errors = {};
+  if (!guest || typeof guest !== "object" || Array.isArray(guest)) {
+    return { errors: { firstName: "Please enter a first name." }, valid: false, data: { firstName: "" } };
+  }
+
   const firstName = cleanName(guest.firstName);
-  const contactNumber = typeof guest.contactNumber === "string" ? guest.contactNumber.trim() : "";
+  const contactNumber = normalizePhilippineMobile(guest.contactNumber);
 
   if (!firstName) errors.firstName = "Please enter a first name.";
-  if (requirePhone && !isValidPhone(contactNumber)) {
+  if (requirePhone && !contactNumber) {
     errors.contactNumber = "Please enter a valid contact number.";
   }
 
@@ -51,7 +50,14 @@ export async function POST(request) {
 
   const primaryResult = validateGuest(primaryGuest, { requirePhone: true });
 
-  const guestList = Array.isArray(coGuests) ? coGuests.slice(0, 20) : [];
+  if (coGuests !== undefined && !Array.isArray(coGuests)) {
+    return NextResponse.json({ ok: false, message: "Invalid guest information." }, { status: 400 });
+  }
+
+  const guestList = coGuests || [];
+  if (guestList.length > 20) {
+    return NextResponse.json({ ok: false, message: "You may add up to 20 co-guests." }, { status: 400 });
+  }
   const coGuestResults = guestList.map((g) => validateGuest(g, { requirePhone: false }));
 
   const allValid = primaryResult.valid && coGuestResults.every((r) => r.valid);

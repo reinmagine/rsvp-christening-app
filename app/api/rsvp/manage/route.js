@@ -1,18 +1,37 @@
 import { NextResponse } from "next/server";
 import { getRsvp, updateRsvp, withdrawRsvp } from "@/lib/rsvpStore";
+import { normalizePhilippineMobile } from "@/lib/phone";
 
-function isValidGuest(guest, requirePhone) {
-  if (!guest || typeof guest !== "object") return false;
-  const digits = String(guest.contactNumber || "").replace(/[^\d]/g, "");
-  return Boolean(String(guest.firstName || "").trim()) &&
-    (!requirePhone || (digits.length >= 7 && digits.length <= 15));
+function validateGuest(guest, requirePhone) {
+  if (!guest || typeof guest !== "object" || Array.isArray(guest)) {
+    return { valid: false, data: { firstName: "" } };
+  }
+
+  const firstName = String(guest.firstName || "").trim().slice(0, 80);
+  const contactNumber = normalizePhilippineMobile(guest.contactNumber);
+  return {
+    valid: Boolean(firstName) && (!requirePhone || Boolean(contactNumber)),
+    data: { firstName, ...(requirePhone ? { contactNumber } : {}) },
+  };
 }
 
 function validEntry(entry) {
-  return entry && (entry.attending === "yes" || entry.attending === "no") &&
-    isValidGuest(entry.primaryGuest, true) &&
-    Array.isArray(entry.coGuests) && entry.coGuests.length <= 20 &&
-    entry.coGuests.every((guest) => isValidGuest(guest, false));
+  if (!entry || typeof entry !== "object" || Array.isArray(entry)) return null;
+  if (entry.attending !== "yes" && entry.attending !== "no") return null;
+  if (!Array.isArray(entry.coGuests) || entry.coGuests.length > 20) return null;
+
+  const primary = validateGuest(entry.primaryGuest, true);
+  const coGuests = entry.coGuests.map((guest) => validateGuest(guest, false));
+  const guestCount = 1 + coGuests.length;
+  if (!primary.valid || coGuests.some((guest) => !guest.valid)) return null;
+  if (!Number.isInteger(entry.guestCount) || entry.guestCount !== guestCount) return null;
+
+  return {
+    attending: entry.attending,
+    primaryGuest: primary.data,
+    coGuests: coGuests.map((guest) => guest.data),
+    guestCount,
+  };
 }
 
 function tokenFrom(request) {
@@ -43,10 +62,11 @@ export async function PATCH(request) {
   }
 
   try {
-    if (!validEntry(entry)) {
+    const validData = validEntry(entry);
+    if (!validData) {
       return NextResponse.json({ ok: false, message: "Please double-check the highlighted fields." }, { status: 400 });
     }
-    const result = await updateRsvp(token, entry);
+    const result = await updateRsvp(token, validData);
     return NextResponse.json({ ok: true, status: result.status });
   } catch {
     return NextResponse.json({ ok: false, message: "Unable to update this RSVP." }, { status: 400 });

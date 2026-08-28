@@ -35,6 +35,10 @@ function doPost(request) {
     if (!entry || !entry.primaryGuest) {
       return jsonResponse({ ok: false, message: "Missing RSVP entry." });
     }
+    if (!isValidEntry(entry)) {
+      return jsonResponse({ ok: false, message: "Invalid RSVP data." });
+    }
+    entry.primaryGuest.contactNumber = normalizePhilippineMobile(entry.primaryGuest.contactNumber);
 
     const spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
     const sheet = SHEET_NAME
@@ -119,6 +123,10 @@ function handleManagementAction(payload) {
   if (payload.action !== "update" || !entry.primaryGuest) {
     return jsonResponse({ ok: false, message: "Invalid RSVP update." });
   }
+  if (!isValidEntry(entry)) {
+    return jsonResponse({ ok: false, message: "Invalid RSVP update." });
+  }
+  entry.primaryGuest.contactNumber = normalizePhilippineMobile(entry.primaryGuest.contactNumber);
 
   const primaryGuest = entry.primaryGuest;
   const coGuests = Array.isArray(entry.coGuests)
@@ -246,6 +254,33 @@ function parseCoGuests(value) {
   } catch (error) {
     return [];
   }
+}
+
+function normalizePhilippineMobile(value) {
+  if (typeof value !== "string") return "";
+
+  var input = value.trim();
+  if (!input || !/^[+\d\s().-]+$/.test(input)) return "";
+  if (input.indexOf("+") > 0 || input.indexOf("+") !== input.lastIndexOf("+")) return "";
+
+  var compact = input.replace(/[\s().-]/g, "");
+  if (/^09\d{9}$/.test(compact)) return compact;
+  if (/^\+639\d{9}$/.test(compact)) return "0" + compact.slice(3);
+  return "";
+}
+
+function isValidEntry(entry) {
+  if (!entry || (entry.attending !== "yes" && entry.attending !== "no")) return false;
+  if (!entry.primaryGuest || typeof entry.primaryGuest !== "object") return false;
+  if (!String(entry.primaryGuest.firstName || "").trim()) return false;
+  if (!normalizePhilippineMobile(entry.primaryGuest.contactNumber)) return false;
+
+  var coGuests = entry.coGuests;
+  if (!Array.isArray(coGuests) || coGuests.length > 20) return false;
+  if (Number(entry.guestCount) !== 1 + coGuests.length) return false;
+  return coGuests.every(function (guest) {
+    return guest && typeof guest === "object" && String(guest.firstName || "").trim();
+  });
 }
 
 function formatSubmittedAt(value) {
