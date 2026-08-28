@@ -1,4 +1,4 @@
-const WEBHOOK_SECRET = "Jm7$Qv2!rL9#xP4@kN8^sT6&bW3*zC5!hY0";
+const WEBHOOK_SECRET = "CFPqR7nh19gjB9k5CcSuS9naexaZ-SMTe1w4_ns11uI";
 const SHEET_NAME = "";
 
 const HEADERS = [
