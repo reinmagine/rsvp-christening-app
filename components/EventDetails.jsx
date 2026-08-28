@@ -46,7 +46,6 @@ export default function EventDetails() {
         </div>
       </div>
 
-      <p className={styles.microcopy}>A little blessing, a beautiful day.</p>
     </section>
   );
 }

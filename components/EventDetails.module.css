@@ -81,14 +81,6 @@
   opacity: 0.7;
 }
 
-.microcopy {
-  margin-top: 22px;
-  font-family: var(--font-body);
-  font-style: italic;
-  color: var(--taupe);
-  font-size: 1.05rem;
-}
-
 @media (min-width: 560px) {
   .venues {
     flex-direction: row;

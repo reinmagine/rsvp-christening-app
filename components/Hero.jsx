@@ -8,7 +8,7 @@ export default function Hero() {
       <CornerFlourish className={styles.flourishLeft} />
       <CornerFlourish className={styles.flourishRight} />
 
-      <p className={styles.eyebrow}>A Little Invitation</p>
+      <p className={styles.eyebrow}>You&rsquo;re warmly invited</p>
       <h1 className={styles.heading}>
         A Little Invitation <span className={styles.heart}>♡</span>
       </h1>

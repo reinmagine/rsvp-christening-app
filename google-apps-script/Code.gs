@@ -77,7 +77,10 @@ function doPost(request) {
     return jsonResponse({ ok: true, rsvpId: row[0] });
   } catch (error) {
     console.error(error);
-    return jsonResponse({ ok: false, message: "Unable to save RSVP." });
+    return jsonResponse({
+      ok: false,
+      message: error && error.message ? `Unable to save RSVP: ${error.message}` : "Unable to save RSVP.",
+    });
   }
 }
 
