@@ -1,0 +1,91 @@
+.hero {
+  position: relative;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding-top: 8px;
+}
+
+.flourishLeft,
+.flourishRight {
+  position: absolute;
+  top: -6px;
+  width: 46px;
+  height: 46px;
+  opacity: 0.7;
+}
+
+.flourishLeft {
+  left: -4px;
+}
+
+.flourishRight {
+  right: -4px;
+  transform: scaleX(-1);
+}
+
+.eyebrow {
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: 1rem;
+  color: var(--blush-deep);
+  margin: 0;
+  letter-spacing: 0.04em;
+}
+
+.heading {
+  font-size: 2.1rem;
+  line-height: 1.15;
+}
+
+.heart {
+  color: var(--blush-deep);
+}
+
+.subheading {
+  color: var(--ink-soft);
+  font-size: 1rem;
+  max-width: 320px;
+  line-height: 1.5;
+  margin-bottom: 6px;
+}
+
+.videoFrame {
+  width: 100%;
+  margin-top: 6px;
+  display: flex;
+  justify-content: center;
+}
+
+/* Arch-topped invitation-card frame around the video */
+.videoArch {
+  width: 100%;
+  max-width: 420px;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: var(--ink);
+  box-shadow: var(--shadow-card);
+  border: 6px solid var(--white);
+  outline: 1px solid rgba(210, 174, 156, 0.5);
+  aspect-ratio: 9 / 16;
+}
+
+.video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  background: var(--ink);
+}
+
+@media (min-width: 640px) {
+  .heading {
+    font-size: 2.6rem;
+  }
+
+  .videoArch {
+    max-width: 460px;
+  }
+}

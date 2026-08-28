@@ -1,0 +1,21 @@
+.footer {
+  text-align: center;
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+
+.signoff {
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: 1.3rem;
+  color: var(--blush-deep);
+  line-height: 1.5;
+}
+
+.meta {
+  margin-top: 10px;
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--taupe);
+}

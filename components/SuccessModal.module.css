@@ -1,0 +1,92 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(91, 64, 56, 0.35);
+  backdrop-filter: blur(3px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 100;
+  animation: fadeIn 0.25s ease;
+}
+
+.modal {
+  position: relative;
+  background: var(--white);
+  border-radius: var(--radius-lg);
+  padding: 40px 28px 32px;
+  max-width: 380px;
+  width: 100%;
+  text-align: center;
+  box-shadow: var(--shadow-card);
+  border: 1px solid rgba(210, 174, 156, 0.4);
+  animation: riseIn 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.modal :global(.sparkleField) {
+  position: absolute;
+  top: -18px;
+  left: 0;
+  width: 100%;
+  height: 40px;
+  opacity: 0.9;
+  animation: sparkle 2.4s ease-in-out infinite;
+}
+
+.heading {
+  font-size: 1.6rem;
+  margin-top: 6px;
+}
+
+.message {
+  margin-top: 14px;
+  color: var(--ink-soft);
+  line-height: 1.55;
+  font-size: 0.98rem;
+}
+
+.small {
+  margin-top: 10px;
+  font-family: var(--font-body);
+  font-style: italic;
+  color: var(--blush-deep);
+  font-size: 1rem;
+}
+
+.doneBtn {
+  margin-top: 26px;
+  width: 100%;
+  background: var(--blush);
+  color: var(--white);
+  border: none;
+  border-radius: 999px;
+  padding: 14px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.1s ease;
+}
+
+.doneBtn:hover {
+  background: var(--blush-deep);
+}
+
+.doneBtn:active {
+  transform: scale(0.98);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes riseIn {
+  from { opacity: 0; transform: translateY(14px) scale(0.97); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes sparkle {
+  0%, 100% { opacity: 0.5; transform: translateY(0); }
+  50% { opacity: 1; transform: translateY(-3px); }
+}
