@@ -7,7 +7,7 @@ export default function Footer() {
       <p className={styles.signoff}>
         With love,
         <br />
-        {eventConfig.babyFirstName} &amp; Family ♡
+        {eventConfig.babyFirstName} &amp; Family
       </p>
       <p className={styles.meta}>
         Christening Celebration &middot; {eventConfig.dateLong}

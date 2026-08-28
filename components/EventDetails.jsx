@@ -5,7 +5,7 @@ export default function EventDetails() {
   return (
     <section className={`card ${styles.wrap}`}>
       <span className="eyebrow">Save the date</span>
-      <h2 className="sectionHeading">{eventConfig.babyFirstName}&rsquo;s Christening ♡</h2>
+      <h2 className="sectionHeading">{eventConfig.babyFirstName}&rsquo;s Christening</h2>
 
       <div className={styles.dateTime}>
         <p className={styles.dateLine}>{eventConfig.dateLong}</p>
