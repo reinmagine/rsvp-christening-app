@@ -8,7 +8,7 @@ import styles from "./RsvpForm.module.css";
 import { normalizePhilippineMobile } from "@/lib/phone";
 import eventConfig from "@/lib/config";
 
-const emptyGuest = () => ({ firstName: "", contactNumber: "" });
+const emptyGuest = () => ({ firstName: "", lastName: "", contactNumber: "" });
 
 export default function RsvpForm() {
   const [primaryGuest, setPrimaryGuest] = useState(emptyGuest());
@@ -44,6 +44,7 @@ export default function RsvpForm() {
   function validateLocally() {
     const primaryErrors = {};
     if (!primaryGuest.firstName.trim()) primaryErrors.firstName = "Please enter your first name.";
+    if (!primaryGuest.lastName.trim()) primaryErrors.lastName = "Please enter your last name.";
     const normalizedContactNumber = normalizePhilippineMobile(primaryGuest.contactNumber);
     if (!normalizedContactNumber) {
       primaryErrors.contactNumber = "Please enter a valid Philippine mobile number.";
@@ -84,6 +85,7 @@ export default function RsvpForm() {
         body: JSON.stringify({
           primaryGuest: {
             ...primaryGuest,
+            lastName: primaryGuest.lastName.trim(),
             contactNumber: normalizePhilippineMobile(primaryGuest.contactNumber),
           },
           coGuests,

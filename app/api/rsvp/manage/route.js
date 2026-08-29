@@ -5,14 +5,22 @@ import eventConfig from "@/lib/config";
 
 function validateGuest(guest, requirePhone) {
   if (!guest || typeof guest !== "object" || Array.isArray(guest)) {
-    return { valid: false, data: { firstName: "" } };
+    return { valid: false, data: { firstName: "", lastName: "" } };
   }
 
   const firstName = String(guest.firstName || "").trim().slice(0, 80);
+  const lastName = String(guest.lastName || "").trim().slice(0, 80);
   const contactNumber = normalizePhilippineMobile(guest.contactNumber);
   return {
-    valid: Boolean(firstName) && (!requirePhone || Boolean(contactNumber)),
-    data: { firstName, ...(requirePhone ? { contactNumber } : {}) },
+    valid:
+      Boolean(firstName) &&
+      Boolean(lastName) &&
+      (!requirePhone || Boolean(contactNumber)),
+    data: {
+      firstName,
+      lastName,
+      ...(requirePhone ? { contactNumber } : {}),
+    },
   };
 }
 

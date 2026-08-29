@@ -10,13 +10,19 @@ function cleanName(value) {
 function validateGuest(guest, { requirePhone }) {
   const errors = {};
   if (!guest || typeof guest !== "object" || Array.isArray(guest)) {
-    return { errors: { firstName: "Please enter a first name." }, valid: false, data: { firstName: "" } };
+    return {
+      errors: { firstName: "Please enter a first name.", lastName: "Please enter a last name." },
+      valid: false,
+      data: { firstName: "", lastName: "" },
+    };
   }
 
   const firstName = cleanName(guest.firstName);
+  const lastName = cleanName(guest.lastName);
   const contactNumber = normalizePhilippineMobile(guest.contactNumber);
 
   if (!firstName) errors.firstName = "Please enter a first name.";
+  if (!lastName) errors.lastName = "Please enter a last name.";
   if (requirePhone && !contactNumber) {
     errors.contactNumber = "Please enter a valid contact number.";
   }
@@ -24,7 +30,11 @@ function validateGuest(guest, { requirePhone }) {
   return {
     errors,
     valid: Object.keys(errors).length === 0,
-    data: { firstName, ...(requirePhone ? { contactNumber } : {}) },
+    data: {
+      firstName,
+      lastName,
+      ...(requirePhone ? { contactNumber } : {}),
+    },
   };
 }
 

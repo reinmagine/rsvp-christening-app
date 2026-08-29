@@ -56,6 +56,29 @@ export default function GuestFields({
         )}
       </div>
 
+      {isPrimary && (
+        <div className={styles.field}>
+          <label htmlFor={`${idPrefix}-lastName`}>
+            Last Name <span className={styles.required}>*</span>
+          </label>
+          <input
+            id={`${idPrefix}-lastName`}
+            type="text"
+            autoComplete="family-name"
+            value={guest.lastName || ""}
+            onChange={handleField("lastName")}
+            disabled={disabled}
+            aria-invalid={Boolean(errors.lastName)}
+            aria-describedby={errors.lastName ? `${idPrefix}-lastName-err` : undefined}
+          />
+          {errors.lastName && (
+            <p id={`${idPrefix}-lastName-err`} className={styles.error}>
+              {errors.lastName}
+            </p>
+          )}
+        </div>
+      )}
+
       {isPrimary && <div className={styles.field}>
         <label htmlFor={`${idPrefix}-contactNumber`}>
           Contact Number <span className={styles.required}>*</span>

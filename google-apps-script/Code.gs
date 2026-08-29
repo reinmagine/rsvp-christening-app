@@ -7,6 +7,7 @@ const HEADERS = [
   "Submitted At",
   "Attending",
   "Primary First Name",
+  "Primary Last Name",
   "Primary Contact Number",
   "Co-Guests",
   "Co-Guests JSON",
@@ -69,6 +70,7 @@ function doPost(request) {
     row[columns.SubmittedAt - 1] = formatSubmittedAt(entry.submittedAt);
     row[columns.Attending - 1] = entry.attending === "yes" ? "Yes" : "No";
     row[columns.PrimaryFirstName - 1] = primaryGuest.firstName || "";
+    row[columns.PrimaryLastName - 1] = primaryGuest.lastName || "";
     row[columns.PrimaryContact - 1] = primaryGuest.contactNumber || "";
     row[columns.CoGuests - 1] = coGuestText;
     row[columns.CoGuestsJSON - 1] = JSON.stringify(coGuests);
@@ -139,6 +141,7 @@ function handleManagementAction(payload) {
 
   sheet.getRange(rowNumber, columns.Attending).setValue(entry.attending === "yes" ? "Yes" : "No");
   sheet.getRange(rowNumber, columns.PrimaryFirstName).setValue(primaryGuest.firstName || "");
+  sheet.getRange(rowNumber, columns.PrimaryLastName).setValue(primaryGuest.lastName || "");
   sheet.getRange(rowNumber, columns.PrimaryContact).setValue(primaryGuest.contactNumber || "");
   sheet.getRange(rowNumber, columns.CoGuests).setValue(coGuestText);
   sheet.getRange(rowNumber, columns.CoGuestsJSON).setValue(JSON.stringify(coGuests));
@@ -167,7 +170,7 @@ function removeDeletedColumns(sheet) {
   if (sheet.getLastColumn() === 0) return;
 
   const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
-  const deletedHeaders = ["Primary M.I.", "Primary Last Name"];
+  const deletedHeaders = ["Primary M.I."];
   for (let index = headers.length - 1; index >= 0; index -= 1) {
     if (deletedHeaders.indexOf(headers[index]) !== -1) {
       sheet.deleteColumn(index + 1);
@@ -181,6 +184,7 @@ function hideNonDisplayColumns(sheet) {
     "Submitted At",
     "Attending",
     "Primary First Name",
+    "Primary Last Name",
     "Primary Contact Number",
     "Co-Guests",
     "Guest Count",
@@ -212,6 +216,7 @@ function getColumns(sheet) {
     SubmittedAt: columns.SubmittedAt,
     Attending: columns.Attending,
     PrimaryFirstName: columns.PrimaryFirstName,
+    PrimaryLastName: columns.PrimaryLastName,
     PrimaryContact: columns.PrimaryContactNumber,
     CoGuests: columns.CoGuests,
     CoGuestsJSON: columns.CoGuestsJSON,
@@ -238,6 +243,7 @@ function readEntry(sheet, columns, rowNumber) {
     attending: String(row[columns.Attending - 1]).toLowerCase() === "yes" ? "yes" : "no",
     primaryGuest: {
       firstName: String(row[columns.PrimaryFirstName - 1] ?? ""),
+      lastName: String(row[columns.PrimaryLastName - 1] ?? ""),
       contactNumber: String(row[columns.PrimaryContact - 1] ?? ""),
     },
     coGuests: parseCoGuests(row[columns.CoGuestsJSON - 1]),
@@ -274,6 +280,7 @@ function isValidEntry(entry) {
   if (!entry || (entry.attending !== "yes" && entry.attending !== "no")) return false;
   if (!entry.primaryGuest || typeof entry.primaryGuest !== "object") return false;
   if (!String(entry.primaryGuest.firstName || "").trim()) return false;
+  if (!String(entry.primaryGuest.lastName || "").trim()) return false;
   if (!normalizePhilippineMobile(entry.primaryGuest.contactNumber)) return false;
 
   var coGuests = entry.coGuests;
