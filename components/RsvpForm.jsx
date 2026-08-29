@@ -43,8 +43,8 @@ export default function RsvpForm() {
 
   function validateLocally() {
     const primaryErrors = {};
-    if (!primaryGuest.firstName.trim()) primaryErrors.firstName = "Please enter your first name.";
-    if (!primaryGuest.lastName.trim()) primaryErrors.lastName = "Please enter your last name.";
+    if (!String(primaryGuest.firstName || "").trim()) primaryErrors.firstName = "Please enter your first name.";
+    if (!String(primaryGuest.lastName || "").trim()) primaryErrors.lastName = "Please enter your last name.";
     const normalizedContactNumber = normalizePhilippineMobile(primaryGuest.contactNumber);
     if (!normalizedContactNumber) {
       primaryErrors.contactNumber = "Please enter a valid Philippine mobile number.";
@@ -85,7 +85,7 @@ export default function RsvpForm() {
         body: JSON.stringify({
           primaryGuest: {
             ...primaryGuest,
-            lastName: primaryGuest.lastName.trim(),
+            lastName: String(primaryGuest.lastName || "").trim(),
             contactNumber: normalizePhilippineMobile(primaryGuest.contactNumber),
           },
           coGuests,

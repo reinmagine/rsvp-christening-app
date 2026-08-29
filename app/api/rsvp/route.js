@@ -11,9 +11,12 @@ function validateGuest(guest, { requirePhone }) {
   const errors = {};
   if (!guest || typeof guest !== "object" || Array.isArray(guest)) {
     return {
-      errors: { firstName: "Please enter a first name.", lastName: "Please enter a last name." },
+      errors: {
+        firstName: "Please enter a first name.",
+        ...(requirePhone ? { lastName: "Please enter a last name." } : {}),
+      },
       valid: false,
-      data: { firstName: "", lastName: "" },
+      data: { firstName: "", ...(requirePhone ? { lastName: "" } : {}) },
     };
   }
 
@@ -22,7 +25,7 @@ function validateGuest(guest, { requirePhone }) {
   const contactNumber = normalizePhilippineMobile(guest.contactNumber);
 
   if (!firstName) errors.firstName = "Please enter a first name.";
-  if (!lastName) errors.lastName = "Please enter a last name.";
+  if (requirePhone && !lastName) errors.lastName = "Please enter a last name.";
   if (requirePhone && !contactNumber) {
     errors.contactNumber = "Please enter a valid contact number.";
   }
@@ -32,8 +35,7 @@ function validateGuest(guest, { requirePhone }) {
     valid: Object.keys(errors).length === 0,
     data: {
       firstName,
-      lastName,
-      ...(requirePhone ? { contactNumber } : {}),
+      ...(requirePhone ? { lastName, contactNumber } : {}),
     },
   };
 }

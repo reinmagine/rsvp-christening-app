@@ -5,7 +5,7 @@ import eventConfig from "@/lib/config";
 
 function validateGuest(guest, requirePhone) {
   if (!guest || typeof guest !== "object" || Array.isArray(guest)) {
-    return { valid: false, data: { firstName: "", lastName: "" } };
+    return { valid: false, data: { firstName: "", ...(requirePhone ? { lastName: "" } : {}) } };
   }
 
   const firstName = String(guest.firstName || "").trim().slice(0, 80);
@@ -14,12 +14,11 @@ function validateGuest(guest, requirePhone) {
   return {
     valid:
       Boolean(firstName) &&
-      Boolean(lastName) &&
+      (!requirePhone || Boolean(lastName)) &&
       (!requirePhone || Boolean(contactNumber)),
     data: {
       firstName,
-      lastName,
-      ...(requirePhone ? { contactNumber } : {}),
+      ...(requirePhone ? { lastName, contactNumber } : {}),
     },
   };
 }

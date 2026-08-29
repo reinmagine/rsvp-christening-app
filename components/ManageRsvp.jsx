@@ -68,8 +68,8 @@ export default function ManageRsvp() {
     event.preventDefault();
 
     const primaryErrors = {};
-    if (!entry.primaryGuest.firstName.trim()) primaryErrors.firstName = "Please enter a first name.";
-    if (!entry.primaryGuest.lastName.trim()) primaryErrors.lastName = "Please enter a last name.";
+    if (!String(entry.primaryGuest.firstName || "").trim()) primaryErrors.firstName = "Please enter a first name.";
+    if (!String(entry.primaryGuest.lastName || "").trim()) primaryErrors.lastName = "Please enter a last name.";
     if (!normalizePhilippineMobile(entry.primaryGuest.contactNumber)) {
       primaryErrors.contactNumber = "Please enter a valid Philippine mobile number.";
     }
@@ -94,7 +94,7 @@ export default function ManageRsvp() {
         attending: entry.attending,
         primaryGuest: {
           ...entry.primaryGuest,
-          lastName: entry.primaryGuest.lastName.trim(),
+          lastName: String(entry.primaryGuest.lastName || "").trim(),
           contactNumber: normalizePhilippineMobile(entry.primaryGuest.contactNumber),
         },
         coGuests: coGuests.map((guest) => ({ firstName: guest.firstName })),
