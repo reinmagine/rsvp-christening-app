@@ -6,7 +6,7 @@ import SuccessModal from "./SuccessModal";
 import { FloralDivider } from "./Decorations";
 import styles from "./RsvpForm.module.css";
 import { normalizePhilippineMobile } from "@/lib/phone";
-import eventConfig from "@/lib/config";
+import eventConfig, { isRsvpClosed } from "@/lib/config";
 
 const emptyGuest = () => ({ firstName: "", lastName: "", contactNumber: "" });
 
@@ -20,6 +20,9 @@ export default function RsvpForm() {
   const [locked, setLocked] = useState(false);
   const [managementUrl, setManagementUrl] = useState("");
 
+  const formClosed = isRsvpClosed();
+  const isFormLocked = locked || formClosed;
+
   function updatePrimaryField(field, value) {
     setPrimaryGuest((g) => ({ ...g, [field]: value }));
   }
@@ -31,6 +34,7 @@ export default function RsvpForm() {
   }
 
   function addGuest() {
+    if (isFormLocked) return;
     setCoGuests((list) =>
       list.length < eventConfig.maxCoGuests ? [...list, emptyGuest()] : list
     );
@@ -70,7 +74,7 @@ export default function RsvpForm() {
 
   async function handleSubmit(e) {
     e.preventDefault();
-    if (status === "submitting" || locked) return;
+    if (status === "submitting" || isFormLocked) return;
 
     const isValid = validateLocally();
     if (!isValid) return;
@@ -113,7 +117,7 @@ export default function RsvpForm() {
   }
 
   const isSubmitting = status === "submitting";
-  const canAddGuest = !locked && !isSubmitting && coGuests.length < eventConfig.maxCoGuests;
+  const canAddGuest = !isFormLocked && !isSubmitting && coGuests.length < eventConfig.maxCoGuests;
 
   return (
     <section className={`card ${styles.wrap}`} id="rsvp">
@@ -121,8 +125,20 @@ export default function RsvpForm() {
       <h2 className="sectionHeading">Will you join us?</h2>
       <p className="supportingText">Please let us know if you&rsquo;ll be celebrating with us.</p>
 
+      <div className={styles.notice}>
+        <strong>RSVP deadline:</strong> Please submit your response by {eventConfig.rsvpDeadlineLabel}.
+        <span>{eventConfig.rsvpPrivacyNote}</span>
+      </div>
+
+      {formClosed && (
+        <div className={styles.closedBanner} role="status" aria-live="polite">
+          <strong>RSVP closed.</strong>
+          <span>{eventConfig.rsvpClosedNotice}</span>
+        </div>
+      )}
+
       <form className={styles.form} onSubmit={handleSubmit} noValidate>
-        <fieldset className={styles.attendFieldset} disabled={locked}>
+        <fieldset className={styles.attendFieldset} disabled={isFormLocked}>
           <legend className={styles.attendLegend}>
             Will you be joining us? <span className={styles.required}>*</span>
           </legend>
@@ -158,7 +174,7 @@ export default function RsvpForm() {
             errors={errors.primaryGuest}
             onChange={updatePrimaryField}
             isPrimary
-            disabled={locked}
+            disabled={isFormLocked}
           />
         </div>
 
@@ -179,7 +195,7 @@ export default function RsvpForm() {
                 onChange={(field, value) => updateCoGuestField(index, field, value)}
                 index={index}
                 onRemove={() => removeGuest(index)}
-                disabled={locked}
+                disabled={isFormLocked}
               />
             ))}
           </div>
@@ -203,8 +219,8 @@ export default function RsvpForm() {
           </div>
         )}
 
-        <button type="submit" className={styles.submitBtn} disabled={isSubmitting || locked}>
-          {isSubmitting ? "Sending…" : locked ? "RSVP Sent" : "RSVP"}
+        <button type="submit" className={styles.submitBtn} disabled={isSubmitting || isFormLocked}>
+          {isSubmitting ? "Sending…" : isFormLocked ? (locked ? "RSVP Sent" : "RSVP Closed") : "RSVP"}
         </button>
       </form>
 

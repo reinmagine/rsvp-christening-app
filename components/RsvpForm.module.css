@@ -3,6 +3,44 @@
   box-shadow: none;
 }
 
+.notice {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 18px;
+  padding: 14px 16px;
+  border-radius: var(--radius-md);
+  background: rgba(239, 224, 214, 0.45);
+  border: 1px solid rgba(210, 174, 156, 0.55);
+  color: var(--ink);
+  font-size: 0.93rem;
+  line-height: 1.5;
+}
+
+.notice strong {
+  font-weight: 700;
+}
+
+.notice span {
+  color: var(--ink-soft, #5d4c43);
+}
+
+.closedBanner {
+  margin-top: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 14px 16px;
+  border-radius: var(--radius-md);
+  background: rgba(102, 88, 78, 0.08);
+  border: 1px solid rgba(102, 88, 78, 0.22);
+  color: var(--ink);
+}
+
+.closedBanner strong {
+  font-size: 1rem;
+}
+
 .form {
   margin-top: 22px;
   display: flex;

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { createManagementToken, createRsvp } from "@/lib/rsvpStore";
 import { normalizePhilippineMobile } from "@/lib/phone";
-import eventConfig from "@/lib/config";
+import eventConfig, { isRsvpClosed } from "@/lib/config";
 
 function cleanName(value) {
   return typeof value === "string" ? value.trim().slice(0, 80) : "";
@@ -41,6 +41,17 @@ function validateGuest(guest, { requirePhone }) {
 }
 
 export async function POST(request) {
+  if (isRsvpClosed()) {
+    return NextResponse.json(
+      {
+        ok: false,
+        message:
+          `RSVP submissions are now closed. The deadline was ${eventConfig.rsvpDeadlineLabel} (Philippine time). We keep all submitted information secure and protected.`,
+      },
+      { status: 403 }
+    );
+  }
+
   let body;
   try {
     body = await request.json();
